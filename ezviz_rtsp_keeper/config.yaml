@@ -1,0 +1,22 @@
+name: "EZVIZ RTSP keeper"
+version: "1.0.0"
+slug: ezviz_rtsp_keeper
+description: "Réactive le RTSP d'une caméra EZVIZ (ex. C3X) quand il se désactive après une coupure de courant."
+url: "https://github.com/cgaspard3333/ha-addon-ezviz-rtsp"
+arch:
+  - aarch64
+  - amd64
+  - armv7
+init: false
+startup: application
+boot: auto
+options:
+  host: ""
+  serial: ""
+  verification_code: ""
+  check_interval: 120
+schema:
+  host: str
+  serial: str
+  verification_code: password
+  check_interval: "int(30,3600)"
