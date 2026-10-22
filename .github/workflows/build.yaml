@@ -1,0 +1,44 @@
+name: Build add-on image
+
+on:
+  push:
+    branches: [main]
+    paths: ["ezviz_rtsp_keeper/**", ".github/workflows/build.yaml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read add-on version
+        id: version
+        run: echo "version=$(sed -n 's/^version: *\"\(.*\)\"/\1/p' ezviz_rtsp_keeper/config.yaml)" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: ezviz_rtsp_keeper
+          platforms: linux/amd64,linux/arm64
+          build-args: BUILD_FROM=python:3.13-slim
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            io.hass.type=addon
+            io.hass.version=${{ steps.version.outputs.version }}
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/ezviz-rtsp-keeper:${{ steps.version.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/ezviz-rtsp-keeper:latest
