@@ -18,7 +18,9 @@ jobs:
 
       - name: Read add-on version
         id: version
-        run: echo "version=$(sed -n 's/^version: *\"\(.*\)\"/\1/p' ezviz_rtsp_keeper/config.yaml)" >> "$GITHUB_OUTPUT"
+        run: |
+          version=$(sed -n 's/^version: *"\(.*\)"/\1/p' ezviz_rtsp_keeper/config.yaml)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
@@ -33,7 +35,7 @@ jobs:
         with:
           context: ezviz_rtsp_keeper
           platforms: linux/amd64,linux/arm64
-          build-args: BUILD_FROM=python:3.13-slim
+          build-args: BUILD_FROM=python:3.13-alpine
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             io.hass.type=addon
